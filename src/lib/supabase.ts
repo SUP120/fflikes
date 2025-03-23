@@ -17,7 +17,7 @@ export type AuthError = {
 
 export type PackageType = 'standard' | 'premium' | 'instant'
 
-export type Package = {
+export interface Package {
   name: string
   amount: number
   likes_count: number
@@ -43,4 +43,19 @@ export const PACKAGE_DETAILS: Record<PackageType, Package> = {
     likes_count: 19,
     description: 'Get 19 instant likes on your Free Fire profile'
   }
+} as const
+
+export interface Order {
+  id: string
+  created_at: string
+  updated_at: string
+  order_id: string
+  name: string
+  email: string
+  ff_uid: string
+  ff_nickname: string
+  package_type: PackageType
+  amount: number
+  likes_count: number
+  status: 'pending' | 'completed' | 'failed'
 } 
