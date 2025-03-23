@@ -130,8 +130,8 @@ export async function POST(request: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-client-id': process.env.CASHFREE_APP_ID,
-          'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+          'x-client-id': process.env.CASHFREE_APP_ID!,
+          'x-client-secret': process.env.CASHFREE_SECRET_KEY!,
           'x-api-version': '2022-09-01'
         },
         body: JSON.stringify(cashfreePayload)
@@ -143,7 +143,14 @@ export async function POST(request: Request) {
       status: response.status,
       statusText: response.statusText,
       headers: Object.fromEntries(response.headers),
-      data: cashfreeData
+      data: cashfreeData,
+      requestPayload: {
+        ...cashfreePayload,
+        customer_details: {
+          ...cashfreePayload.customer_details,
+          customer_email: '***@***.com'
+        }
+      }
     })
 
     if (!response.ok) {
