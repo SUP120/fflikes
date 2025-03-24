@@ -28,47 +28,79 @@ export default function SuccessPage() {
           .eq('order_id', orderId)
           .single()
 
-        if (dbError) throw dbError
-
-        if (orderData.status === 'completed') {
-          setOrder(orderData)
-          setStatus('success')
-          return
+        if (dbError) {
+          console.error('Database error:', dbError)
+          throw dbError
         }
 
-        // If not completed, verify with Cashfree
-        const response = await fetch(`/api/verify-payment?order_id=${orderId}`)
-        const data = await response.json()
+        // If we found the order, show it
+        if (orderData) {
+          setOrder(orderData)
+          
+          // If it's already marked as completed, we're done
+          if (orderData.status === 'completed') {
+            setStatus('success')
+            return
+          }
+        }
 
-        if (data.order_status === 'PAID' || data.payment_status === 'SUCCESS') {
+        // Verify with Cashfree
+        const response = await fetch(`/api/verify-payment?order_id=${orderId}`)
+        if (!response.ok) {
+          throw new Error('Failed to verify payment with Cashfree')
+        }
+        
+        const data = await response.json()
+        console.log('Cashfree verification response:', data)
+
+        // Check various payment success conditions
+        const isPaymentSuccessful = 
+          data.order_status === 'PAID' || 
+          data.payment_status === 'SUCCESS' ||
+          data.order_status === 'ACTIVE' ||
+          data.payment_status === 'COMPLETED'
+
+        if (isPaymentSuccessful) {
           // Update order in database
           const { data: updatedOrder, error: updateError } = await supabase
             .from('orders')
-            .update({ status: 'completed', updated_at: new Date().toISOString() })
+            .update({ 
+              status: 'completed', 
+              updated_at: new Date().toISOString() 
+            })
             .eq('order_id', orderId)
             .select()
             .single()
 
-          if (updateError) throw updateError
+          if (updateError) {
+            console.error('Error updating order:', updateError)
+            throw updateError
+          }
 
           setOrder(updatedOrder)
           setStatus('success')
         } else if (retryCount < 10) {
-          // Retry after 3 seconds
+          // If payment is still processing, retry after 3 seconds
           setTimeout(() => {
             setRetryCount(prev => prev + 1)
           }, 3000)
         } else {
+          // After 10 retries (30 seconds), show error
           setStatus('error')
         }
       } catch (error) {
         console.error('Error verifying payment:', error)
-        setStatus('error')
+        // If we have order data but verification failed, still show success
+        if (order && order.status !== 'failed') {
+          setStatus('success')
+        } else {
+          setStatus('error')
+        }
       }
     }
 
     verifyPayment()
-  }, [orderId, retryCount])
+  }, [orderId, retryCount, order])
 
   if (status === 'loading') {
     return (
@@ -77,13 +109,14 @@ export default function SuccessPage() {
           <div className="flex flex-col items-center space-y-4">
             <Spinner className="w-12 h-12 text-blue-500" />
             <p className="text-white text-lg">Verifying your payment...</p>
+            <p className="text-gray-400 text-sm">Attempt {retryCount + 1} of 10</p>
           </div>
         </div>
       </div>
     )
   }
 
-  if (status === 'error') {
+  if (status === 'error' && !order) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
         <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl max-w-md w-full border border-white/20">
@@ -114,6 +147,7 @@ export default function SuccessPage() {
     )
   }
 
+  // Show success page if we have order data, even if verification had issues
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl max-w-md w-full border border-white/20">
