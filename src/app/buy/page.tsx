@@ -37,7 +37,9 @@ export default function BuyPage() {
     document.body.appendChild(script)
 
     return () => {
-      document.body.removeChild(script)
+      if (document.body.contains(script)) {
+        document.body.removeChild(script)
+      }
     }
   }, [])
 
@@ -47,12 +49,21 @@ export default function BuyPage() {
     setError('')
 
     try {
+      // Validate package selection
+      const selectedPackage = PACKAGE_DETAILS.find(pkg => pkg.id === formData.package_type)
+      if (!selectedPackage) {
+        throw new Error('Please select a package')
+      }
+
       const response = await fetch('/api/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          package_type: selectedPackage.id
+        }),
       })
 
       const data = await response.json()
@@ -62,7 +73,7 @@ export default function BuyPage() {
       }
 
       // Initialize Cashfree
-      if (!window.Cashfree) {
+      if (typeof window === 'undefined' || !window.Cashfree) {
         throw new Error('Payment gateway not loaded. Please try again.')
       }
 
@@ -112,19 +123,19 @@ export default function BuyPage() {
                   ₹{details.price}
                 </div>
                 <ul className="space-y-3 mb-8 text-gray-100">
-                  <li className="flex items-center">
+                  <li className="flex items-center justify-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     {details.likes} Likes
                   </li>
-                  <li className="flex items-center">
+                  <li className="flex items-center justify-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     Instant Delivery
                   </li>
-                  <li className="flex items-center">
+                  <li className="flex items-center justify-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
@@ -132,6 +143,7 @@ export default function BuyPage() {
                   </li>
                 </ul>
                 <button
+                  type="button"
                   onClick={() => setFormData(prev => ({ ...prev, package_type: details.id }))}
                   className={`w-full px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                     formData.package_type === details.id
@@ -149,6 +161,11 @@ export default function BuyPage() {
         {formData.package_type && (
           <div className="mt-12 max-w-md mx-auto bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20">
             <h2 className="text-2xl font-bold text-white mb-6">Enter Your Details</h2>
+            {error && (
+              <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg">
+                <p className="text-red-400">{error}</p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300">
@@ -210,28 +227,16 @@ export default function BuyPage() {
                 />
               </div>
 
-              {error && (
-                <div className="bg-red-900/50 border border-red-700 text-red-400 px-4 py-3 rounded-lg">
-                  {error}
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className={`w-full px-6 py-3 rounded-lg font-medium text-white transition-all duration-200 ${
+                  loading
+                    ? 'bg-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                }`}
               >
-                {loading ? (
-                  <div className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
-                  </div>
-                ) : (
-                  'Proceed to Payment'
-                )}
+                {loading ? 'Processing...' : 'Proceed to Payment'}
               </button>
             </form>
           </div>
