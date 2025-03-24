@@ -78,7 +78,7 @@ export default function BuyPage() {
       }
 
       const cashfree = new window.Cashfree({
-        mode: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+        mode: 'production'
       })
 
       // Redirect to Cashfree payment page
