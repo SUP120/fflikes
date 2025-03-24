@@ -1,8 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PACKAGE_DETAILS } from '@/lib/supabase'
+
+declare global {
+  interface Window {
+    Cashfree: {
+      new (config: { mode: 'production' | 'sandbox' }): {
+        checkout: (config: {
+          paymentSessionId: string;
+          returnUrl: string;
+        }) => Promise<void>;
+      };
+    };
+  }
+}
 
 export default function BuyPage() {
   const [loading, setLoading] = useState(false)
@@ -15,6 +28,18 @@ export default function BuyPage() {
     package_type: ''
   })
   const router = useRouter()
+
+  useEffect(() => {
+    // Load Cashfree SDK
+    const script = document.createElement('script')
+    script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
+    script.async = true
+    document.body.appendChild(script)
+
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -36,8 +61,16 @@ export default function BuyPage() {
         throw new Error(data.error || 'Failed to create order')
       }
 
+      // Initialize Cashfree
+      if (!window.Cashfree) {
+        throw new Error('Payment gateway not loaded. Please try again.')
+      }
+
+      const cashfree = new window.Cashfree({
+        mode: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+      })
+
       // Redirect to Cashfree payment page
-      const cashfree = await window.initCashfree()
       await cashfree.checkout({
         paymentSessionId: data.payment_session_id,
         returnUrl: `${window.location.origin}/success?order_id=${data.order_id}`,
