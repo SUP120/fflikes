@@ -17,14 +17,16 @@ export type AuthError = {
 
 export type PackageType = 'standard' | 'premium' | 'instant'
 
-export interface Package {
+export type Package = {
+  id: string
   name: string
-  amount: number
-  likes_count: number
   description: string
+  price: number
+  likes: number
+  type: 'standard' | 'premium' | 'instant'
 }
 
-export const PACKAGE_DETAILS = [
+export const PACKAGE_DETAILS: Package[] = [
   {
     id: 'test',
     name: 'Test Package',
@@ -49,21 +51,21 @@ export const PACKAGE_DETAILS = [
     likes: 1500,
     type: 'premium',
   },
-] as const;
+] as const
 
 export interface Order {
   id: string
   created_at: string
-  updated_at: string
   order_id: string
   name: string
   email: string
   ff_uid: string
   ff_nickname: string
-  package_type: PackageType
+  package_type: string
   amount: number
   likes_count: number
   status: 'pending' | 'completed' | 'failed'
+  progress: number
 }
 
 // SQL query to add progress column (run this in Supabase SQL editor):

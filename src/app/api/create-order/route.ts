@@ -1,68 +1,55 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PACKAGE_DETAILS, PackageType } from '@/lib/supabase'
-import crypto from 'crypto'
+import { PACKAGE_DETAILS } from '@/lib/supabase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-interface OrderRequest {
-  name: string
-  email: string
-  ff_uid: string
-  ff_nickname: string
-  package_type: PackageType
-}
+const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID
+const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY
+const CASHFREE_API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.cashfree.com/pg/orders'
+  : 'https://sandbox.cashfree.com/pg/orders'
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    // Log all environment variables (except their values)
-    console.log('Available environment variables:', {
-      NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      CASHFREE_APP_ID: !!process.env.CASHFREE_APP_ID,
-      CASHFREE_SECRET_KEY: !!process.env.CASHFREE_SECRET_KEY,
-      CASHFREE_WEBHOOK_URL: !!process.env.CASHFREE_WEBHOOK_URL
-    })
+    if (!CASHFREE_APP_ID || !CASHFREE_SECRET_KEY) {
+      throw new Error('Missing Cashfree credentials')
+    }
 
-    // Validate environment variables
-    if (!process.env.CASHFREE_APP_ID || !process.env.CASHFREE_SECRET_KEY) {
-      console.error('Missing Cashfree credentials:', {
-        hasAppId: !!process.env.CASHFREE_APP_ID,
-        hasSecretKey: !!process.env.CASHFREE_SECRET_KEY
-      })
+    const body = await req.json()
+    const { name, email, ff_uid, ff_nickname, package_type } = body
+
+    // Validate required fields
+    if (!name || !email || !ff_uid || !ff_nickname || !package_type) {
       return NextResponse.json(
-        { error: 'Payment gateway configuration error' },
-        { status: 500 }
+        { error: 'Missing required fields' },
+        { status: 400 }
       )
     }
 
-    const body = await request.json()
-    console.log('Received order request:', {
-      ...body,
-      email: '***@***.com' // Hide email for privacy
-    })
-
-    const { name, email, ff_uid, ff_nickname, package_type } = body as OrderRequest
-
-    // Type guard for package_type
-    if (!isValidPackageType(package_type)) {
-      return NextResponse.json({ error: 'Invalid package type' }, { status: 400 })
+    // Validate package type
+    const selectedPackage = PACKAGE_DETAILS.find(pkg => pkg.id === package_type)
+    if (!selectedPackage) {
+      return NextResponse.json(
+        { error: 'Invalid package type' },
+        { status: 400 }
+      )
     }
 
-    const amount = PACKAGE_DETAILS[package_type].amount
-    const likes_count = PACKAGE_DETAILS[package_type].likes_count
+    const amount = selectedPackage.price
+    const likes_count = selectedPackage.likes
 
     // Generate unique order ID
-    const orderId = `order_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`
+    const order_id = `FF${Date.now()}${Math.floor(Math.random() * 1000)}`
 
-    // Create order in database
+    // Create order in Supabase
     const { error: dbError } = await supabase
       .from('orders')
       .insert({
-        order_id: orderId,
+        order_id,
         name,
         email,
         ff_uid,
@@ -70,123 +57,57 @@ export async function POST(request: Request) {
         package_type,
         amount,
         likes_count,
-        status: 'pending'
+        status: 'pending',
+        progress: 0
       })
 
     if (dbError) {
       console.error('Database error:', dbError)
-      return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+      throw new Error('Failed to create order')
     }
 
-    // Calculate expiry time (30 minutes from now)
-    const expiryTime = new Date()
-    expiryTime.setMinutes(expiryTime.getMinutes() + 30)
-
-    const origin = request.headers.get('origin') || 'https://fflikes-seven.vercel.app'
-    // Ensure HTTPS is used
-    const returnUrl = origin.startsWith('http://') 
-      ? origin.replace('http://', 'https://') 
-      : origin
-    const webhookUrl = process.env.CASHFREE_WEBHOOK_URL || `${returnUrl}/api/payment-webhook`
-
-    // Create order with Cashfree
-    const cashfreePayload = {
-      order_id: orderId,
+    // Create order in Cashfree
+    const cashfreeOrder = {
+      order_id,
       order_amount: amount,
-      order_currency: "INR",
+      order_currency: 'INR',
       customer_details: {
         customer_id: ff_uid,
-        customer_name: name,
         customer_email: email,
-        customer_phone: "9999999999"
+        customer_phone: '9999999999' // Required by Cashfree but not collected
       },
       order_meta: {
-        return_url: `${returnUrl}/success?order_id=${orderId}`,
-        notify_url: webhookUrl
-      },
-      order_tags: {
-        type: package_type
-      },
-      order_expiry_time: expiryTime.toISOString()
+        return_url: `${req.nextUrl.origin}/success?order_id=${order_id}`
+      }
     }
 
-    console.log('Creating Cashfree order with payload:', {
-      ...cashfreePayload,
-      customer_details: {
-        ...cashfreePayload.customer_details,
-        customer_email: '***@***.com' // Hide email for privacy
-      }
+    const response = await fetch(CASHFREE_API_URL, {
+      method: 'POST',
+      headers: {
+        'x-api-version': '2022-09-01',
+        'x-client-id': CASHFREE_APP_ID,
+        'x-client-secret': CASHFREE_SECRET_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cashfreeOrder)
     })
 
-    console.log('Using Cashfree credentials:', {
-      appId: process.env.CASHFREE_APP_ID,
-      secretKeyLength: process.env.CASHFREE_SECRET_KEY?.length,
-      webhookUrl
-    })
-
-    const response = await fetch(
-      'https://api.cashfree.com/pg/orders',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-client-id': process.env.CASHFREE_APP_ID!,
-          'x-client-secret': process.env.CASHFREE_SECRET_KEY!,
-          'x-api-version': '2022-09-01'
-        },
-        body: JSON.stringify(cashfreePayload)
-      }
-    )
-
-    const cashfreeData = await response.json()
-    console.log('Cashfree response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      data: cashfreeData,
-      requestPayload: {
-        ...cashfreePayload,
-        customer_details: {
-          ...cashfreePayload.customer_details,
-          customer_email: '***@***.com'
-        }
-      }
-    })
+    const data = await response.json()
 
     if (!response.ok) {
-      console.error('Cashfree error:', {
-        status: response.status,
-        statusText: response.statusText,
-        data: cashfreeData
-      })
-      
-      // Delete the order from database if Cashfree order creation fails
-      await supabase
-        .from('orders')
-        .delete()
-        .eq('order_id', orderId)
-
-      return NextResponse.json(
-        { error: cashfreeData.message || 'Failed to create payment' },
-        { status: response.status }
-      )
+      console.error('Cashfree error:', data)
+      throw new Error('Failed to create payment')
     }
 
     return NextResponse.json({
-      order_id: cashfreeData.order_id,
-      payment_session_id: cashfreeData.payment_session_id
+      payment_session_id: data.payment_session_id,
+      order_id
     })
-
   } catch (error) {
     console.error('Error creating order:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create order' },
       { status: 500 }
     )
   }
-}
-
-// Type guard function
-function isValidPackageType(value: unknown): value is PackageType {
-  return typeof value === 'string' && value in PACKAGE_DETAILS
 } 
