@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { PACKAGE_DETAILS } from '@/lib/supabase'
 
@@ -6,171 +8,191 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-                  <span className="block">Boost Your</span>
-                  <span className="block text-blue-400">Free Fire Profile</span>
-                </h1>
-                <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Get more likes on your Free Fire profile instantly. Choose from our various packages and enhance your gaming presence.
-                </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      href="/buy"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      Get Started
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </main>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-8">
+              Boost Your Free Fire Profile
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 mb-12">
+              Get instant likes on your Free Fire profile and stand out from the crowd
+            </p>
+            <Link
+              href="/buy"
+              className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-200 transform hover:scale-105"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="py-12 bg-gray-800 bg-opacity-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-400 font-semibold tracking-wide uppercase">Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-              Why Choose FFLikes?
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Why Choose FFLikes?
+          </h2>
+          <p className="text-xl text-gray-300">
+            We provide the best service for your Free Fire profile
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <div className="text-blue-400 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">Instant Delivery</h3>
+            <p className="text-gray-300">
+              Get your likes delivered instantly after payment confirmation
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-              {[
-                {
-                  title: 'Instant Delivery',
-                  description: 'Get likes delivered to your profile quickly and efficiently.',
-                  icon: (
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  ),
-                },
-                {
-                  title: 'Secure Payment',
-                  description: 'Your transactions are protected with industry-standard security.',
-                  icon: (
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  ),
-                },
-                {
-                  title: '24/7 Support',
-                  description: 'Our team is always here to help you with any questions.',
-                  icon: (
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  ),
-                },
-              ].map((feature) => (
-                <div key={feature.title} className="relative">
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
-                    {feature.icon}
-                  </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-white">{feature.title}</p>
-                  <dd className="mt-2 ml-16 text-base text-gray-300">
-                    {feature.description}
-                  </dd>
-                </div>
-              ))}
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <div className="text-green-400 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
             </div>
+            <h3 className="text-xl font-bold text-white mb-4">100% Safe</h3>
+            <p className="text-gray-300">
+              Your account is completely safe with our service
+            </p>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <div className="text-purple-400 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-4">24/7 Support</h3>
+            <p className="text-gray-300">
+              Our team is always here to help you with any issues
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Packages Preview Section */}
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-10">
-            <h2 className="text-base text-blue-400 font-semibold tracking-wide uppercase">Packages</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-              Choose Your Package
-            </p>
-          </div>
+      {/* Pricing Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Choose Your Package
+          </h2>
+          <p className="text-xl text-gray-300">
+            Select a package that suits your needs
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {Object.entries(PACKAGE_DETAILS).map(([type, details]) => (
-              <div
-                key={type}
-                className="relative rounded-2xl bg-white p-8 shadow-xl transform hover:scale-105 transition-all duration-300"
-              >
-                <h3 className="text-2xl font-bold text-gray-900 capitalize mb-4">
-                  {type} Package
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {PACKAGE_DETAILS.map((pkg) => (
+            <div
+              key={pkg.id}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:border-blue-500/50 transition-all duration-300"
+            >
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  {pkg.name}
                 </h3>
-                <div className="text-5xl font-bold text-blue-600 mb-6">
-                  ₹{details.amount}
+                <div className="text-5xl font-bold text-white mb-6">
+                  ₹{pkg.price}
                 </div>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <ul className="space-y-3 mb-8 text-gray-100">
+                  <li className="flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    {details.likes_count} Likes
+                    {pkg.likes} Likes
+                  </li>
+                  <li className="flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Instant Delivery
+                  </li>
+                  <li className="flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    24/7 Support
                   </li>
                 </ul>
                 <Link
                   href="/buy"
-                  className="block w-full text-center py-3 px-6 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+                  className="block w-full px-6 py-3 text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-lg transition-all duration-200"
                 >
                   Get Started
                 </Link>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Footer with Policy Links */}
-      <footer className="bg-gray-900 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <nav className="flex flex-wrap justify-center space-x-6 md:space-x-12">
-            <Link
-              href="/contact"
-              className="text-base text-gray-400 hover:text-white transition-colors duration-200"
-            >
-              Contact Us
-            </Link>
-            <Link
-              href="/terms"
-              className="text-base text-gray-400 hover:text-white transition-colors duration-200"
-            >
-              Terms & Conditions
-            </Link>
-            <Link
-              href="/refunds"
-              className="text-base text-gray-400 hover:text-white transition-colors duration-200"
-            >
-              Refunds & Cancellations
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/track"
-              className="text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-lg font-medium transition-all duration-200"
-            >
-              Track Progress
-            </Link>
-            <Link
-              href="/admin/login"
-              className="text-gray-300 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              Admin Login
-            </Link>
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">About Us</h3>
+              <p className="text-gray-400">
+                We provide the best service for boosting your Free Fire profile with instant likes delivery.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/track" className="text-gray-400 hover:text-white transition-colors">
+                    Track Order
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/login" className="text-gray-400 hover:text-white transition-colors">
+                    Admin Login
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                    Terms & Conditions
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/refunds" className="text-gray-400 hover:text-white transition-colors">
+                    Refund Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Contact</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <a href="mailto:support@fflikes.com" className="text-gray-400 hover:text-white transition-colors">
+                    support@fflikes.com
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p className="mt-8 text-center text-base text-gray-400">
-            &copy; {new Date().getFullYear()} FFLikes. All rights reserved.
-          </p>
+          <div className="mt-12 pt-8 border-t border-gray-800 text-center">
+            <p className="text-gray-400">
+              &copy; {new Date().getFullYear()} FFLikes. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
