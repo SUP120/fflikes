@@ -61,12 +61,15 @@ export default function SuccessPage() {
           data.payment_status === 'COMPLETED'
 
         if (isPaymentSuccessful) {
-          // Update order in database
+          // Update order in database with more details
           const { data: updatedOrder, error: updateError } = await supabase
             .from('orders')
             .update({ 
-              status: 'completed', 
-              updated_at: new Date().toISOString() 
+              status: 'completed',
+              progress: 'success',
+              payment_status: 'PAID',
+              updated_at: new Date().toISOString(),
+              payment_details: data // Store the full payment verification response
             })
             .eq('order_id', orderId)
             .select()

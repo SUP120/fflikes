@@ -27,13 +27,17 @@ export async function POST(request: NextRequest) {
     }
 
     const orderId = payload.order_id
+    const orderStatus = payload.order_status?.toLowerCase()
     const paymentStatus = payload.payment_status?.toLowerCase()
 
     // Update order status in database
     const { error: updateError } = await supabase
       .from('orders')
       .update({
-        status: paymentStatus === 'paid' ? 'completed' : 'failed',
+        status: (orderStatus === 'paid' || paymentStatus === 'success') ? 'completed' : 'failed',
+        progress: (orderStatus === 'paid' || paymentStatus === 'success') ? 'success' : 'failed',
+        payment_status: payload.payment_status,
+        payment_details: payload,
         updated_at: new Date().toISOString()
       })
       .eq('order_id', orderId)
