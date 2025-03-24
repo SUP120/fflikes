@@ -154,6 +154,20 @@ export default function Home() {
               Refunds & Cancellations
             </Link>
           </nav>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/track"
+              className="text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-lg font-medium transition-all duration-200"
+            >
+              Track Progress
+            </Link>
+            <Link
+              href="/admin/login"
+              className="text-gray-300 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              Admin Login
+            </Link>
+          </div>
           <p className="mt-8 text-center text-base text-gray-400">
             &copy; {new Date().getFullYear()} FFLikes. All rights reserved.
           </p>

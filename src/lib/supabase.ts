@@ -24,26 +24,32 @@ export interface Package {
   description: string
 }
 
-export const PACKAGE_DETAILS: Record<PackageType, Package> = {
-  standard: {
+export const PACKAGE_DETAILS = [
+  {
+    id: 'test',
+    name: 'Test Package',
+    description: 'Test package for 1 like',
+    price: 1,
+    likes: 1,
+    type: 'instant',
+  },
+  {
+    id: 'standard',
     name: 'Standard Package',
-    amount: 500,
-    likes_count: 700,
-    description: 'Get 700 likes on your Free Fire profile'
+    description: '700 Likes for your Free Fire Profile',
+    price: 500,
+    likes: 700,
+    type: 'standard',
   },
-  premium: {
+  {
+    id: 'premium',
     name: 'Premium Package',
-    amount: 1000,
-    likes_count: 1500,
-    description: 'Get 1500 likes on your Free Fire profile'
+    description: '1500 Likes for your Free Fire Profile',
+    price: 1000,
+    likes: 1500,
+    type: 'premium',
   },
-  instant: {
-    name: 'Instant Package',
-    amount: 50,
-    likes_count: 19,
-    description: 'Get 19 instant likes on your Free Fire profile'
-  }
-} as const
+] as const;
 
 export interface Order {
   id: string
@@ -58,4 +64,10 @@ export interface Order {
   amount: number
   likes_count: number
   status: 'pending' | 'completed' | 'failed'
-} 
+}
+
+// SQL query to add progress column (run this in Supabase SQL editor):
+/*
+ALTER TABLE orders
+ADD COLUMN progress integer DEFAULT 0 NOT NULL;
+*/ 
