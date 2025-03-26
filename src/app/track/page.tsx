@@ -1,21 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase'
+import { Order } from '@/lib/supabase'
 
 export default function TrackOrder() {
   const [orderId, setOrderId] = useState('')
-  const [orderStatus, setOrderStatus] = useState(null)
+  const [orderStatus, setOrderStatus] = useState<Order | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [progress, setProgress] = useState(0)
 
-  const handleTrackOrder = async (e) => {
+  const handleTrackOrder = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    // TODO: Implement order tracking logic
-    setLoading(false)
+    
+    try {
+      // Fetch order status from Supabase
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('order_id', orderId)
+        .single()
+
+      if (orderError) throw orderError
+
+      if (!order) {
+        setError('Order not found. Please check your order ID.')
+        setLoading(false)
+        return
+      }
+
+      // Set order status and progress
+      setOrderStatus(order)
+      setProgress(order.progress || 0)
+    } catch (err) {
+      setError('Failed to fetch order status. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -78,6 +104,22 @@ export default function TrackOrder() {
             <div className="mt-8">
               <div className="bg-white/5 rounded-lg p-6">
                 <h3 className="text-xl font-semibold text-white mb-4">Order Status</h3>
+                
+                {/* Progress Bar */}
+                <div className="mb-6">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-white font-medium">Progress</span>
+                    <span className="text-blue-400 font-medium">{progress}%</span>
+                  </div>
+                  <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Order Details */}
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3">
@@ -90,26 +132,61 @@ export default function TrackOrder() {
                       <p className="text-gray-400 text-sm">Your payment has been successfully processed</p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-3">
+                    <div className={`w-8 h-8 rounded-full ${progress > 0 ? 'bg-blue-500' : 'bg-gray-500'} flex items-center justify-center mr-3`}>
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
                     <div>
                       <p className="text-white font-medium">Processing Order</p>
-                      <p className="text-gray-400 text-sm">Your likes are being delivered to your profile</p>
+                      <p className="text-gray-400 text-sm">
+                        {progress > 0 
+                          ? `Your likes are being delivered (${progress}% complete)`
+                          : 'Waiting to start delivery'}
+                      </p>
                     </div>
                   </div>
+                  
                   <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mr-3">
+                    <div className={`w-8 h-8 rounded-full ${progress === 100 ? 'bg-purple-500' : 'bg-gray-500'} flex items-center justify-center mr-3`}>
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
                       <p className="text-white font-medium">Completed</p>
-                      <p className="text-gray-400 text-sm">All likes have been delivered to your profile</p>
+                      <p className="text-gray-400 text-sm">
+                        {progress === 100 
+                          ? 'All likes have been delivered to your profile'
+                          : 'Waiting for delivery to complete'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Details Table */}
+                <div className="mt-6 border-t border-white/10 pt-6">
+                  <h4 className="text-lg font-semibold text-white mb-4">Order Details</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-gray-400 text-sm">Order ID</p>
+                      <p className="text-white font-medium">{orderStatus.order_id}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 text-sm">Package</p>
+                      <p className="text-white font-medium">{orderStatus.package_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 text-sm">Amount</p>
+                      <p className="text-white font-medium">₹{orderStatus.amount}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 text-sm">Order Date</p>
+                      <p className="text-white font-medium">
+                        {new Date(orderStatus.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 </div>

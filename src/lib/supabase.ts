@@ -53,19 +53,16 @@ export const PACKAGE_DETAILS: Package[] = [
   },
 ] as const
 
-export interface Order {
-  id: string
-  created_at: string
+export type Order = {
   order_id: string
-  name: string
-  email: string
-  ff_uid: string
-  ff_nickname: string
-  package_type: string
+  customer_name: string
+  customer_email: string
+  package_name: string
   amount: number
-  likes_count: number
-  status: 'pending' | 'completed' | 'failed'
+  status: 'pending' | 'processing' | 'completed' | 'failed'
   progress: number
+  created_at: string
+  updated_at: string
 }
 
 // SQL query to add progress column (run this in Supabase SQL editor):
