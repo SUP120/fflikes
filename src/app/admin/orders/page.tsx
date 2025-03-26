@@ -38,7 +38,8 @@ const AdminOrdersPage = () => {
         .from('orders')
         .update({ 
           progress: newProgress,
-          status: newProgress === 100 ? 'completed' : 'processing'
+          status: newProgress === 100 ? 'completed' : 'processing',
+          updated_at: new Date().toISOString()
         })
         .eq('order_id', orderId)
 
@@ -47,13 +48,45 @@ const AdminOrdersPage = () => {
       // Update local state
       setOrders(orders.map(order => 
         order.order_id === orderId 
-          ? { ...order, progress: newProgress, status: newProgress === 100 ? 'completed' : 'processing' }
+          ? { 
+              ...order, 
+              progress: newProgress, 
+              status: newProgress === 100 ? 'completed' : 'processing',
+              updated_at: new Date().toISOString()
+            }
           : order
       ))
 
       toast.success('Order progress updated successfully')
     } catch (err) {
+      console.error('Update error:', err)
       toast.error('Failed to update order progress')
+    }
+  }
+
+  const handleUpdatePaymentStatus = async (orderId: string, newStatus: 'success' | 'failed') => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          payment_status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('order_id', orderId)
+
+      if (error) throw error
+
+      // Update local state
+      setOrders(orders.map(order => 
+        order.order_id === orderId 
+          ? { ...order, payment_status: newStatus, updated_at: new Date().toISOString() }
+          : order
+      ))
+
+      toast.success('Payment status updated successfully')
+    } catch (err) {
+      console.error('Update error:', err)
+      toast.error('Failed to update payment status')
     }
   }
 
@@ -86,7 +119,8 @@ const AdminOrdersPage = () => {
               <th className="pb-4">Customer</th>
               <th className="pb-4">Package</th>
               <th className="pb-4">Amount</th>
-              <th className="pb-4">Status</th>
+              <th className="pb-4">Payment Status</th>
+              <th className="pb-4">Order Status</th>
               <th className="pb-4">Progress</th>
               <th className="pb-4">Actions</th>
             </tr>
@@ -98,6 +132,15 @@ const AdminOrdersPage = () => {
                 <td className="py-4">{order.customer_name}</td>
                 <td className="py-4">{order.package_name}</td>
                 <td className="py-4">₹{order.amount}</td>
+                <td className="py-4">
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    order.payment_status === 'success' ? 'bg-green-500/20 text-green-400' :
+                    order.payment_status === 'failed' ? 'bg-red-500/20 text-red-400' :
+                    'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {order.payment_status}
+                  </span>
+                </td>
                 <td className="py-4">
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     order.status === 'completed' ? 'bg-green-500/20 text-green-400' :
@@ -118,7 +161,7 @@ const AdminOrdersPage = () => {
                     <span className="text-sm text-gray-400">{order.progress || 0}%</span>
                   </div>
                 </td>
-                <td className="py-4">
+                <td className="py-4 space-x-2">
                   <button
                     onClick={() => {
                       setSelectedOrder(order)
@@ -128,6 +171,20 @@ const AdminOrdersPage = () => {
                   >
                     Update Progress
                   </button>
+                  <div className="mt-2">
+                    <button
+                      onClick={() => handleUpdatePaymentStatus(order.order_id, 'success')}
+                      className="text-green-400 hover:text-green-300 text-sm"
+                    >
+                      Mark Paid
+                    </button>
+                    <button
+                      onClick={() => handleUpdatePaymentStatus(order.order_id, 'failed')}
+                      className="text-red-400 hover:text-red-300 text-sm ml-2"
+                    >
+                      Mark Failed
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -61,6 +61,7 @@ export type Order = {
   amount: number
   status: 'pending' | 'processing' | 'completed' | 'failed'
   progress: number
+  payment_status: 'success' | 'failed' | 'pending'
   created_at: string
   updated_at: string
 }
