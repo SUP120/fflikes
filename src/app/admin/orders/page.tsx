@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
+import { Order } from '@/lib/supabase'
 
 const AdminOrdersPage = () => {
-  const [orders, setOrders] = useState([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -23,15 +24,15 @@ const AdminOrdersPage = () => {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setOrders(data)
+      setOrders(data || [])
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Failed to fetch orders')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUpdateProgress = async (orderId, newProgress) => {
+  const handleUpdateProgress = async (orderId: string, newProgress: number) => {
     try {
       const { error } = await supabase
         .from('orders')
@@ -54,6 +55,25 @@ const AdminOrdersPage = () => {
     } catch (err) {
       toast.error('Failed to update order progress')
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-8 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-8 flex items-center justify-center">
+        <div className="text-red-500 text-center">
+          <p className="text-xl mb-4">Error loading orders</p>
+          <p className="text-gray-400">{error}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -100,7 +120,10 @@ const AdminOrdersPage = () => {
                 </td>
                 <td className="py-4">
                   <button
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={() => {
+                      setSelectedOrder(order)
+                      setProgress(order.progress || 0)
+                    }}
                     className="text-blue-400 hover:text-blue-300"
                   >
                     Update Progress

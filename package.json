@@ -22,6 +22,7 @@
     "nodemailer": "^6.10.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hot-toast": "^2.5.2",
     "utf-8-validate": "^6.0.5"
   },
   "devDependencies": {
