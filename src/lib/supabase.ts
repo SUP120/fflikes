@@ -66,8 +66,23 @@ export type Order = {
   updated_at: string
 }
 
-// SQL query to add progress column (run this in Supabase SQL editor):
+// SQL queries to update orders table (run these in Supabase SQL editor):
 /*
+-- Add payment_status column
 ALTER TABLE orders
-ADD COLUMN progress integer DEFAULT 0 NOT NULL;
+ADD COLUMN payment_status text DEFAULT 'pending' NOT NULL;
+
+-- Add progress column if not exists
+ALTER TABLE orders
+ADD COLUMN IF NOT EXISTS progress integer DEFAULT 0 NOT NULL;
+
+-- Add updated_at column if not exists
+ALTER TABLE orders
+ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL;
+
+-- Update existing orders to have default values
+UPDATE orders
+SET payment_status = 'pending' WHERE payment_status IS NULL,
+    progress = 0 WHERE progress IS NULL,
+    updated_at = timezone('utc'::text, now()) WHERE updated_at IS NULL;
 */ 

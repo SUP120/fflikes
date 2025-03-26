@@ -24,8 +24,10 @@ const AdminOrdersPage = () => {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      console.log('Fetched orders:', data)
       setOrders(data || [])
     } catch (err) {
+      console.error('Fetch error:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch orders')
     } finally {
       setLoading(false)
@@ -34,7 +36,9 @@ const AdminOrdersPage = () => {
 
   const handleUpdateProgress = async (orderId: string, newProgress: number) => {
     try {
-      const { error } = await supabase
+      console.log('Updating progress for order:', orderId, 'to:', newProgress)
+      
+      const { data, error } = await supabase
         .from('orders')
         .update({ 
           progress: newProgress,
@@ -42,8 +46,15 @@ const AdminOrdersPage = () => {
           updated_at: new Date().toISOString()
         })
         .eq('order_id', orderId)
+        .select()
+        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Update error:', error)
+        throw error
+      }
+
+      console.log('Update response:', data)
 
       // Update local state
       setOrders(orders.map(order => 
@@ -66,15 +77,24 @@ const AdminOrdersPage = () => {
 
   const handleUpdatePaymentStatus = async (orderId: string, newStatus: 'success' | 'failed') => {
     try {
-      const { error } = await supabase
+      console.log('Updating payment status for order:', orderId, 'to:', newStatus)
+      
+      const { data, error } = await supabase
         .from('orders')
         .update({ 
           payment_status: newStatus,
           updated_at: new Date().toISOString()
         })
         .eq('order_id', orderId)
+        .select()
+        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Update error:', error)
+        throw error
+      }
+
+      console.log('Update response:', data)
 
       // Update local state
       setOrders(orders.map(order => 
