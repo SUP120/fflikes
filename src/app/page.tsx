@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { PACKAGE_DETAILS } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
@@ -24,7 +25,13 @@ export default function Home() {
       <div className="relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center opacity-20"></div>
+          <Image
+            src="/1.jpeg"
+            alt="Free Fire Background"
+            fill
+            className="object-cover opacity-20"
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/80 to-gray-900"></div>
           {/* Animated Particles */}
           <div className="absolute inset-0 overflow-hidden">
@@ -118,41 +125,33 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:border-blue-500/50 transition-all duration-300 transform hover:-translate-y-2">
-            <div className="bg-blue-500/10 rounded-xl w-16 h-16 flex items-center justify-center mb-6 text-blue-400 group-hover:bg-blue-500/20 transition-all duration-300">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+        {/* Feature Images Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="relative group overflow-hidden rounded-2xl h-64">
+            <Image
+              src="/2.jpg"
+              alt="Premium Service"
+              fill
+              className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
+            <div className="relative p-8 h-full flex flex-col justify-end">
+              <h3 className="text-2xl font-bold text-white mb-2">Premium Service</h3>
+              <p className="text-gray-300">Experience the best Free Fire likes service with our premium packages</p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors">Instant Delivery</h3>
-            <p className="text-gray-300">
-              Our advanced system ensures your likes are delivered within minutes after payment confirmation
-            </p>
           </div>
-
-          <div className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:border-green-500/50 transition-all duration-300 transform hover:-translate-y-2">
-            <div className="bg-green-500/10 rounded-xl w-16 h-16 flex items-center justify-center mb-6 text-green-400 group-hover:bg-green-500/20 transition-all duration-300">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+          <div className="relative group overflow-hidden rounded-2xl h-64">
+            <Image
+              src="/3.jpg"
+              alt="Instant Delivery"
+              fill
+              className="object-cover transform group-hover:scale-110 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
+            <div className="relative p-8 h-full flex flex-col justify-end">
+              <h3 className="text-2xl font-bold text-white mb-2">Instant Delivery</h3>
+              <p className="text-gray-300">Get your likes delivered instantly after payment confirmation</p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-4 group-hover:text-green-400 transition-colors">100% Safe & Secure</h3>
-            <p className="text-gray-300">
-              Your account is completely safe with our premium service - we use only legitimate methods
-            </p>
-          </div>
-
-          <div className="group bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-2">
-            <div className="bg-purple-500/10 rounded-xl w-16 h-16 flex items-center justify-center mb-6 text-purple-400 group-hover:bg-purple-500/20 transition-all duration-300">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">Premium Support</h3>
-            <p className="text-gray-300">
-              Our dedicated team is available 24/7 to help you with any questions or issues you may have
-            </p>
           </div>
         </div>
 
@@ -197,6 +196,16 @@ export default function Home() {
         {/* Background decorations */}
         <div className="absolute left-1/4 bottom-0 w-72 h-72 bg-blue-600/30 rounded-full filter blur-3xl opacity-20"></div>
         <div className="absolute right-1/4 top-0 w-80 h-80 bg-purple-600/30 rounded-full filter blur-3xl opacity-20"></div>
+        
+        {/* Pricing Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/4.jpg"
+            alt="Pricing Background"
+            fill
+            className="object-cover opacity-5"
+          />
+        </div>
         
         <div className="text-center mb-16 relative">
           <span className="inline-block px-3 py-1 bg-blue-900/50 rounded-full text-blue-300 text-sm font-medium mb-4">Best Value</span>
@@ -308,7 +317,15 @@ export default function Home() {
 
       {/* Testimonials */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
-        <div className="absolute left-0 top-1/3 w-64 h-64 bg-purple-600/20 rounded-full filter blur-3xl opacity-20"></div>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/5.jpg"
+            alt="Testimonials Background"
+            fill
+            className="object-cover opacity-5"
+          />
+        </div>
         
         <div className="text-center mb-16 relative">
           <span className="inline-block px-3 py-1 bg-blue-900/50 rounded-full text-blue-300 text-sm font-medium mb-4">Testimonials</span>
@@ -392,7 +409,15 @@ export default function Home() {
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-16">
         <div className="relative overflow-hidden rounded-3xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+          <div className="absolute inset-0">
+            <Image
+              src="/6.jpg"
+              alt="CTA Background"
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/90"></div>
           <div className="absolute inset-0 bg-[url('/cta-pattern.jpg')] mix-blend-overlay opacity-10"></div>
           
           <div className="relative px-8 py-16 md:py-20 flex flex-col items-center text-center">
