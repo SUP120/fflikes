@@ -1,179 +1,177 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
+import Image from 'next/image'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-export default function TrackProgress() {
+export default function TrackOrder() {
   const [orderId, setOrderId] = useState('')
+  const [orderStatus, setOrderStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [order, setOrder] = useState<any>(null)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleTrackOrder = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setOrder(null)
-
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
-        .single()
-
-      if (error) throw error
-      if (!data) {
-        setError('Order not found. Please check the order ID and try again.')
-        return
-      }
-
-      setOrder(data)
-    } catch (error) {
-      console.error('Error fetching order:', error)
-      setError('Failed to fetch order details. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+    // TODO: Implement order tracking logic
+    setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/2.jpg"
+          alt="Track Order Background"
+          fill
+          className="object-cover opacity-10"
+        />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">Track Your Progress</h1>
-          <p className="text-gray-300">Enter your order ID to check the status of your likes</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Track Your <span className="text-blue-500">Order</span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Enter your order ID to check the status of your Free Fire likes delivery
+          </p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8 mb-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Track Order Form */}
+        <div className="max-w-2xl mx-auto bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+          <form onSubmit={handleTrackOrder} className="space-y-6">
             <div>
               <label htmlFor="orderId" className="block text-sm font-medium text-gray-300 mb-2">
                 Order ID
               </label>
-              <input
-                id="orderId"
-                type="text"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-                placeholder="Enter your order ID"
-                className="w-full px-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                required
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="orderId"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your order ID"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50"
+                >
+                  {loading ? 'Tracking...' : 'Track Order'}
+                </button>
+              </div>
             </div>
-
-            {error && (
-              <div className="bg-red-900/50 border border-red-700 text-red-400 px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            >
-              {loading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Checking...
-                </div>
-              ) : (
-                'Check Progress'
-              )}
-            </button>
           </form>
-        </div>
 
-        {order && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8 space-y-6 animate-fade-in">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-400">Order Details</h3>
-                <div className="mt-2 space-y-4">
-                  <div>
-                    <p className="text-sm text-gray-400">Order ID</p>
-                    <p className="text-lg font-medium text-white">{order.id}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Package</p>
-                    <p className="text-lg font-medium text-white">{order.package_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Amount</p>
-                    <p className="text-lg font-medium text-white">₹{order.amount}</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-400">Progress Details</h3>
-                <div className="mt-2 space-y-4">
-                  <div>
-                    <p className="text-sm text-gray-400">Status</p>
-                    <span className={`inline-block mt-1 px-3 py-1 text-sm font-medium rounded-full ${
-                      order.status === 'completed'
-                        ? 'bg-green-900/50 text-green-400 border border-green-700'
-                        : order.status === 'pending'
-                        ? 'bg-yellow-900/50 text-yellow-400 border border-yellow-700'
-                        : 'bg-red-900/50 text-red-400 border border-red-700'
-                    }`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400 mb-2">Progress</p>
-                    <div className="relative pt-1">
-                      <div className="flex mb-2 items-center justify-between">
-                        <div>
-                          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-400 bg-blue-900/50 border border-blue-700">
-                            {order.progress}% Complete
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex h-2 overflow-hidden bg-gray-700 rounded-full">
-                        <div
-                          style={{ width: `${order.progress}%` }}
-                          className="flex flex-col justify-center overflow-hidden bg-blue-600 transition-all duration-500"
-                        ></div>
-                      </div>
+          {error && (
+            <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+              {error}
+            </div>
+          )}
+
+          {orderStatus && (
+            <div className="mt-8">
+              <div className="bg-white/5 rounded-lg p-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Order Status</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Payment Confirmed</p>
+                      <p className="text-gray-400 text-sm">Your payment has been successfully processed</p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Order Date</p>
-                    <p className="text-lg font-medium text-white">
-                      {new Date(order.created_at).toLocaleString()}
-                    </p>
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Processing Order</p>
+                      <p className="text-gray-400 text-sm">Your likes are being delivered to your profile</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Completed</p>
+                      <p className="text-gray-400 text-sm">All likes have been delivered to your profile</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          )}
+        </div>
 
-            {order.status === 'completed' && (
-              <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 mt-6">
-                <p className="text-green-400">
-                  Your order has been completed! All likes have been delivered to your account.
-                </p>
-              </div>
-            )}
-
-            {order.status === 'pending' && (
-              <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mt-6">
-                <p className="text-yellow-400">
-                  Your order is being processed. We are currently delivering likes to your account.
-                  Please check back later for updates.
-                </p>
-              </div>
-            )}
+        {/* How It Works Section */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">1. Purchase Package</h3>
+            <p className="text-gray-400">
+              Choose a package and complete the payment process to get your order ID
+            </p>
           </div>
-        )}
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">2. Get Order ID</h3>
+            <p className="text-gray-400">
+              After successful payment, you'll receive a unique order ID
+            </p>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">3. Track Progress</h3>
+            <p className="text-gray-400">
+              Enter your order ID here to check the delivery status
+            </p>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-16 text-center">
+          <p className="text-xl text-gray-300 mb-8">
+            Don't have an order ID yet? Purchase a package to get started!
+          </p>
+          <Link
+            href="/buy"
+            className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 transform hover:scale-105"
+          >
+            Buy Likes Now
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
   )

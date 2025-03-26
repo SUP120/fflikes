@@ -23,6 +23,36 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 overflow-hidden">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
+        {/* Top Navigation */}
+        <div className="absolute top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <Link href="/" className="flex items-center">
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-2">
+                  <span className="text-white font-bold">FF</span>
+                </div>
+                <span className="text-white font-bold text-xl">FF Paid Likes</span>
+              </Link>
+              <div className="flex items-center space-x-4">
+                <Link
+                  href="/track"
+                  className="inline-flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-200"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Track Order
+                </Link>
+                <Link
+                  href="/buy"
+                  className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200"
+                >
+                  Buy Likes
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Animated Background */}
         <div className="absolute inset-0 z-0">
           <Image
