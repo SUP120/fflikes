@@ -28,27 +28,27 @@ export type Package = {
 
 export const PACKAGE_DETAILS: Package[] = [
   {
-    id: 'test',
-    name: 'Test Package',
-    description: 'Test package for 1 like',
-    price: 1,
-    likes: 1,
-    type: 'instant',
+    id: 'basic',
+    name: 'Basic Package',
+    description: '100 Likes for your Free Fire Profile',
+    price: 19,
+    likes: 100,
+    type: 'standard',
   },
   {
     id: 'standard',
     name: 'Standard Package',
-    description: '700 Likes for your Free Fire Profile',
-    price: 500,
-    likes: 700,
+    description: '1000 Likes for your Free Fire Profile',
+    price: 199,
+    likes: 1000,
     type: 'standard',
   },
   {
     id: 'premium',
     name: 'Premium Package',
-    description: '1500 Likes for your Free Fire Profile',
-    price: 1000,
-    likes: 1500,
+    description: '5000 Likes for your Free Fire Profile',
+    price: 899,
+    likes: 5000,
     type: 'premium',
   },
 ] as const
@@ -82,7 +82,14 @@ ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone DEFAULT timezone('u
 
 -- Update existing orders to have default values
 UPDATE orders
-SET payment_status = 'pending' WHERE payment_status IS NULL,
-    progress = 0 WHERE progress IS NULL,
-    updated_at = timezone('utc'::text, now()) WHERE updated_at IS NULL;
+SET payment_status = 'pending'
+WHERE payment_status IS NULL;
+
+UPDATE orders
+SET progress = 0
+WHERE progress IS NULL;
+
+UPDATE orders
+SET updated_at = timezone('utc'::text, now())
+WHERE updated_at IS NULL;
 */ 
